@@ -1,0 +1,2 @@
+py_env_supported_actions:
+  - deploy_envs

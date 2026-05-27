@@ -1,0 +1,33 @@
+# @var py_env_actions:description: >
+# List of actions the role does, accepts one or more actions.
+# Use comma without spaces as a delimiter for multiple actions.
+# @var py_env_actions:required: `true`
+# @var py_env_actions:type: String
+# @var py_env_actions:example: >
+#   py_env_actions: deploy_envs
+# @end
+
+# @var py_env_list:description: >
+# Mapping of virtual environment paths to their configuration.
+# Each key is the absolute path for the venv; state defaults to present.
+# @var py_env_list:required: `true`, only in case `py_env_actions: deploy_envs`
+# @var py_env_list:type: Dict
+# @var py_env_list:example: $>
+# {
+#   "/opt/myapp/venv": {
+#     "state": "present",
+#     "packages": [
+#       {"name": "requests", "state": "present"},
+#       {"name": "flask", "state": "present"}
+#     ]
+#   },
+#   "/opt/oldapp/venv": {
+#     "state": "absent"
+#   }
+# }
+# @end
+
+# @var py_env_interpreter:description: Python interpreter used to create virtual environments
+# @var py_env_interpreter:type: String
+# @end
+py_env_interpreter: /usr/bin/python3

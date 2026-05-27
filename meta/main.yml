@@ -1,6 +1,6 @@
 galaxy_info:
   author: freedform
-  description: py_env role
+  description: Role py_env automates creation, package management, and removal of Python virtual environments
   min_ansible_version: "2.20"
   license: MIT
 

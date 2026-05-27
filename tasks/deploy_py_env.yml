@@ -1,14 +1,15 @@
-- name: CREATE BLOCK
+- name: Create virtual environment "{{ py_env_path }}"
   when:
     - py_env_data.state | default('present') == 'present'
   block:
     - name: Create venv in "{{ py_env_path }}"
       ansible.builtin.command:
-        cmd: "/usr/bin/python3 -m venv {{ py_env_path }}"
+        cmd: "{{ py_env_interpreter }} -m venv {{ py_env_path }}"
         creates: "{{ py_env_path }}/bin/activate"
 
     - name: Install packages in "{{ py_env_path }}"
       when:
+        - py_env_data.packages is defined
         - py_env_data.packages is iterable
         - py_env_data.packages is not string
         - py_env_data.packages | length > 0
@@ -16,12 +17,12 @@
         name: "{{ py_env_package.name }}"
         state: "{{ py_env_package.state | default('present') }}"
         virtualenv: "{{ py_env_path }}"
-      loop: "{{ py_env_data.packages | default([]) }}"
+      loop: "{{ py_env_data.packages }}"
       loop_control:
         loop_var: py_env_package
         label: "Deploying {{ py_env_package.name }} in {{ py_env_path }}"
 
-- name: DELETE BLOCK
+- name: Remove virtual environment "{{ py_env_path }}"
   when:
     - py_env_data.state | default('present') == 'absent'
   block:

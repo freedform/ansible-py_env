@@ -1,22 +1,16 @@
-- name: Validate py_env_list variable
+---
+- name: Create py_env_action_list
+  ansible.builtin.set_fact:
+    py_env_action_list: "{{ py_env_actions.split(',') }}"
+
+- name: Validate py_env_action_list
   ansible.builtin.assert:
     that:
-      - py_env_list is defined
-      - py_env_list is mapping
+      - py_env_action_list | length > 0
+      - py_env_action_list | difference(py_env_supported_actions) | length == 0
 
-- name: Install python venv package
-  ansible.builtin.apt:
-    name: python3-venv
-    state: present
-    update_cache: true
-    cache_valid_time: 3600
-
-- name: Deploy python virtual environment
-  ansible.builtin.include_tasks: deploy_py_env.yml
-  loop: "{{ py_env_list | dict2items }}"
+- name: Run py_env action
+  ansible.builtin.include_tasks: "{{ task_name }}.yml"
+  loop: "{{ py_env_action_list }}"
   loop_control:
-    label: "Deploying {{ py_env_path }}"
-    loop_var: py_env
-  vars:
-    py_env_path: "{{ py_env.key }}"
-    py_env_data: "{{ py_env.value }}"
+    loop_var: task_name
