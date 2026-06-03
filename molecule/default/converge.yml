@@ -2,13 +2,22 @@
 - name: Converge
   hosts: all
   gather_facts: true
+  vars:
+    py_env_actions: deploy_envs
+    py_env_list:
+      /opt/present_venv:
+        state: present
+      /opt/pkg_venv:
+        state: present
+        packages:
+          - name: requests
+            state: present
+      /opt/pkg_remove_venv:
+        state: present
+        packages:
+          - name: certifi
+            state: absent
+      /opt/absent_venv:
+        state: absent
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
-      vars:
-        py_env_actions: deploy_envs
-        py_env_list:
-          /opt/testvenv:
-            state: present
-            packages:
-              - name: pip
-                state: present

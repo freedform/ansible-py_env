@@ -1,0 +1,68 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Stat present_venv activate script
+      ansible.builtin.stat:
+        path: /opt/present_venv/bin/activate
+      register: present_venv_activate
+
+    - name: Assert present_venv was created
+      ansible.builtin.assert:
+        that: present_venv_activate.stat.exists
+        fail_msg: "/opt/present_venv/bin/activate should exist"
+
+    - name: Stat pkg_venv activate script
+      ansible.builtin.stat:
+        path: /opt/pkg_venv/bin/activate
+      register: pkg_venv_activate
+
+    - name: Assert pkg_venv was created
+      ansible.builtin.assert:
+        that: pkg_venv_activate.stat.exists
+        fail_msg: "/opt/pkg_venv/bin/activate should exist"
+
+    - name: Check requests is installed in pkg_venv
+      ansible.builtin.command:
+        cmd: /opt/pkg_venv/bin/pip show requests
+      register: pip_show_requests
+      changed_when: false
+      failed_when: false
+
+    - name: Assert requests is installed in pkg_venv
+      ansible.builtin.assert:
+        that: pip_show_requests.rc == 0
+        fail_msg: "requests should be installed in /opt/pkg_venv"
+
+    - name: Stat pkg_remove_venv activate script
+      ansible.builtin.stat:
+        path: /opt/pkg_remove_venv/bin/activate
+      register: pkg_remove_venv_activate
+
+    - name: Assert pkg_remove_venv still exists
+      ansible.builtin.assert:
+        that: pkg_remove_venv_activate.stat.exists
+        fail_msg: "/opt/pkg_remove_venv/bin/activate should exist"
+
+    - name: Check certifi is not installed in pkg_remove_venv
+      ansible.builtin.command:
+        cmd: /opt/pkg_remove_venv/bin/pip show certifi
+      register: pip_show_certifi
+      changed_when: false
+      failed_when: false
+
+    - name: Assert certifi was removed from pkg_remove_venv
+      ansible.builtin.assert:
+        that: pip_show_certifi.rc != 0
+        fail_msg: "certifi should not be installed in /opt/pkg_remove_venv"
+
+    - name: Stat absent_venv directory
+      ansible.builtin.stat:
+        path: /opt/absent_venv
+      register: absent_venv
+
+    - name: Assert absent_venv was removed
+      ansible.builtin.assert:
+        that: not absent_venv.stat.exists
+        fail_msg: "/opt/absent_venv should not exist"

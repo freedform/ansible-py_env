@@ -1,0 +1,26 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install python3-venv
+      ansible.builtin.apt:
+        name: python3-venv
+        state: present
+        update_cache: true
+
+    - name: Pre-create absent_venv so the role has a real venv to remove
+      ansible.builtin.command:
+        cmd: python3 -m venv /opt/absent_venv
+        creates: /opt/absent_venv/bin/activate
+
+    - name: Pre-create pkg_remove_venv
+      ansible.builtin.command:
+        cmd: python3 -m venv /opt/pkg_remove_venv
+        creates: /opt/pkg_remove_venv/bin/activate
+
+    - name: Pre-install certifi in pkg_remove_venv
+      ansible.builtin.pip:
+        name: certifi
+        state: present
+        virtualenv: /opt/pkg_remove_venv
